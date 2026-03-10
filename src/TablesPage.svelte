@@ -1,78 +1,35 @@
 <script lang="ts">
-  function dispatchNavigate(route: string) {
-    window.dispatchEvent(new CustomEvent('navigate', { detail: { route } }));
-  }
+  import PageHeader from './components/PageHeader.svelte';
+  import { tables } from './lib/data';
+  import { navigate, showToast } from './store';
+
+  let search = '';
+
+  $: filteredTables = tables.filter((table) => table.name.toLowerCase().includes(search.toLowerCase()));
 </script>
 
-<div class="tables-container">
-  <div class="header">
-    <h2>Tables</h2>
-    <button class="create-btn" on:click={() => dispatchNavigate('/table-detail')}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      <span>Create new table</span>
-    </button>
-  </div>
+<div class="page active">
+  <PageHeader title="Tables" action={{ label: 'Create Table', icon: 'plus', onClick: () => showToast('New table created!') }} />
 
-  <div class="card table-card" on:click={() => dispatchNavigate('/table-detail')}>
-    <div>
-      <div class="table-name">Personal Documents</div>
-      <div class="table-info">125 rows - Last updated: 2 hours ago</div>
+  <div class="page-content">
+    <div class="search-bar">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+      <input bind:value={search} type="text" placeholder="Search tables..." />
     </div>
-    <span>&gt;</span>
-  </div>
 
-  <div class="card table-card" on:click={() => dispatchNavigate('/table-detail')}>
-    <div>
-      <div class="table-name">Work Invoices</div>
-      <div class="table-info">42 rows - Last updated: 1 day ago</div>
+    <div class="tables-list">
+      {#each filteredTables as table}
+        <button class="table-card" on:click={() => navigate('/table-detail')}>
+          <div class="table-card-icon" style={`background:${table.iconBackground};`}>{table.icon}</div>
+          <div class="table-card-name">{table.name}</div>
+          <div class="table-card-desc">{table.description}</div>
+          <div class="table-card-footer">
+            <span class="table-tag table-tag-blue">{table.provider}</span>
+            <span class="table-tag" class:table-tag-green={table.status === 'Active'} class:table-tag-amber={table.status === 'Syncing'} class:table-tag-red={table.status === 'Locked'}>{table.status}</span>
+            <span class="table-card-rows">{table.rows} rows</span>
+          </div>
+        </button>
+      {/each}
     </div>
-    <span>&gt;</span>
   </div>
-
 </div>
-
-<style>
-  .tables-container {
-    padding: var(--space-md);
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-lg);
-  }
-
-  .create-btn {
-    display: flex;
-    align-items: center;
-    background-color: var(--color-accent);
-    color: white;
-    border: none;
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-weight: 500;
-  }
-
-  .create-btn svg {
-    margin-right: var(--space-sm);
-  }
-
-  .table-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .table-name {
-    font-weight: 500;
-    margin-bottom: var(--space-xs);
-  }
-
-  .table-info {
-    font-size: 0.9rem;
-    color: var(--color-text-secondary);
-  }
-</style>

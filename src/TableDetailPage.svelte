@@ -1,100 +1,49 @@
 <script lang="ts">
-  function dispatchNavigate(route: string) {
-    window.dispatchEvent(new CustomEvent('navigate', { detail: { route } }));
-  }
+  import PageHeader from './components/PageHeader.svelte';
+  import { addRowFilters, tableRows } from './lib/data';
+  import { navigate } from './store';
+
+  let activeFilter = 'All';
+
+  $: filteredRows = activeFilter === 'All' ? tableRows : tableRows.filter((row) => row.status === activeFilter);
 </script>
 
-<div class="table-detail-container">
-  <div class="header">
-    <h2>My Documents</h2>
-    <button class="add-btn" on:click={() => dispatchNavigate('/add-row')}>Add Row</button>
-  </div>
+<div class="page active">
+  <PageHeader title="Project Documents" backRoute="/tables" action={{ label: 'Add Row', icon: 'plus', onClick: () => navigate('/add-row') }} />
 
-  <div class="table-card-list">
-    <!-- Row 1 -->
-    <div class="card data-row-card">
-      <div class="row-main-info">
-        <div class="file-name">Passport.pdf</div>
-        <div class="file-category">IDs</div>
-      </div>
-      <div class="row-secondary-info">
-        <div class="file-year">2023</div>
-        <div class="actions">📎</div>
-      </div>
-    </div>
-
-    <!-- Row 2 -->
-    <div class="card data-row-card">
-      <div class="row-main-info">
-        <div class="file-name">Birth_Certificate.pdf</div>
-        <div class="file-category">Official</div>
-      </div>
-      <div class="row-secondary-info">
-        <div class="file-year">2023</div>
-        <div class="actions">📎</div>
-      </div>
+  <div class="detail-header-info">
+    <div class="detail-meta">
+      <div class="detail-meta-item">48 rows</div>
+      <div class="detail-meta-item">Google Drive</div>
+      <div class="detail-meta-item">Updated 2m ago</div>
     </div>
   </div>
 
+  <div class="filter-bar">
+    {#each addRowFilters as filter}
+      <button class="filter-chip" class:active={activeFilter === filter} on:click={() => (activeFilter = filter)}>{filter}</button>
+    {/each}
+  </div>
+
+  <div class="detail-scroll-wrap">
+    <div class="rows-list">
+      {#each filteredRows as row}
+        <div class="row-card">
+          <div class="row-card-header">
+            <div class="row-thumb">{row.icon}</div>
+            <div class="row-title">{row.title}</div>
+            <span class="row-badge" class:badge-active={row.status === 'Active'} class:badge-pending={row.status === 'Pending'} class:badge-archived={row.status === 'Archived'}>{row.status}</span>
+          </div>
+          <div class="row-fields">
+            {#each row.fields as field}
+              <div class="row-field">
+                <div class="row-field-label">{field.label}</div>
+                <div class="row-field-val">{field.value}</div>
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/each}
+    </div>
+  </div>
 </div>
-
-<style>
-  .table-detail-container {
-    padding: var(--space-md);
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-lg);
-  }
-
-  .add-btn {
-    background-color: var(--color-accent);
-    color: white;
-    border: none;
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-weight: 500;
-  }
-  
-  .data-row-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-md);
-    margin-bottom: var(--space-md);
-  }
-
-  .file-name {
-    font-weight: 500;
-    margin-bottom: var(--space-xs);
-  }
-
-  .file-category {
-    font-size: 0.9rem;
-    color: var(--color-text-secondary);
-    background-color: var(--color-background);
-    padding: var(--space-xs) var(--space-sm);
-    border-radius: var(--radius-sm);
-    display: inline-block;
-  }
-  
-  .row-secondary-info {
-      text-align: right;
-  }
-
-  .file-year {
-    font-size: 0.9rem;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-xs);
-
-  }
-  
-  .actions {
-      cursor: pointer;
-      font-size: 1.2rem;
-  }
-</style>

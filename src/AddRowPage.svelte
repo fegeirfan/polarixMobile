@@ -1,85 +1,72 @@
 <script lang="ts">
-  let selectedDrive = '';
+  import PageHeader from './components/PageHeader.svelte';
+  import { showToast, navigate } from './store';
 
-  function dispatchNavigate(route: string) {
-    window.dispatchEvent(new CustomEvent('navigate', { detail: { route } }));
-  }
+  const submit = () => {
+    showToast('Row added successfully!');
+    navigate('/table-detail');
+  };
 </script>
 
-<div class="add-row-container">
-  <h2>Add New Row</h2>
+<div class="page active">
+  <PageHeader title="Add Row" backRoute="/table-detail" />
 
-  <div class="form-group">
-    <label for="file-name">File Name</label>
-    <input type="text" id="file-name" />
+  <div class="page-content">
+    <div class="form-body">
+      <div class="form-group">
+        <label class="form-label" for="row-table">Table</label>
+        <select id="row-table" class="form-select">
+          <option>Project Documents</option>
+          <option>Media Archive</option>
+          <option>Research Data</option>
+          <option>Email Attachments</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="row-file-name">File Name</label>
+        <input id="row-file-name" type="text" class="form-input" placeholder="e.g. Q3_Report_Final.pdf" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="row-drive">Drive</label>
+        <select id="row-drive" class="form-select">
+          <option>Google Drive</option>
+          <option>Dropbox</option>
+          <option>OneDrive</option>
+          <option>S3 Bucket</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="row-client">Client / Tag</label>
+        <input id="row-client" type="text" class="form-input" placeholder="e.g. Acme Corp" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="row-status">Status</label>
+        <select id="row-status" class="form-select">
+          <option>Active</option>
+          <option>Pending</option>
+          <option>Archived</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="row-notes">Notes</label>
+        <textarea id="row-notes" class="form-input" rows="3" placeholder="Optional notes..." style="resize:none; line-height:1.5;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="row-upload">Upload File</label>
+        <button id="row-upload" type="button" class="upload-zone" on:click={() => showToast('File picker opened')}>
+          <div class="upload-zone-icon">📎</div>
+          <div class="upload-zone-text">Tap to upload</div>
+          <div class="upload-zone-sub">PDF, DOCX, XLSX, images...</div>
+        </button>
+      </div>
+
+      <button class="btn-submit" on:click={submit}>Add Row -&gt;</button>
+    </div>
   </div>
-
-  <div class="form-group">
-    <label for="category">Category</label>
-    <input type="text" id="category" />
-  </div>
-
-  <div class="form-group">
-    <label for="year">Year</label>
-    <input type="number" id="year" />
-  </div>
-
-  <div class="form-group">
-    <label for="upload">Upload File</label>
-    <input type="file" id="upload" />
-  </div>
-
-  <div class="form-group">
-    <label for="drive-select">Upload to Drive</label>
-    <select bind:value={selectedDrive}>
-      <option disabled value="">Select a drive</option>
-      <option value="user@gmail.com">user@gmail.com</option>
-      <option value="work@example.com">work@example.com</option>
-    </select>
-  </div>
-
-  <button class="save-btn" on:click={() => dispatchNavigate('/table-detail')}>Save</button>
-
 </div>
-
-<style>
-  .add-row-container {
-    padding: var(--space-md);
-  }
-
-  h2 {
-    margin-bottom: var(--space-lg);
-  }
-
-  .form-group {
-    margin-bottom: var(--space-lg);
-  }
-
-  label {
-    display: block;
-    margin-bottom: var(--space-sm);
-    font-weight: 500;
-    color: var(--color-text-secondary);
-  }
-
-  input, select {
-    width: 100%;
-    padding: var(--space-md);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
-    background-color: var(--color-background-secondary);
-    box-sizing: border-box;
-  }
-
-  .save-btn {
-    width: 100%;
-    background-color: var(--color-accent);
-    color: white;
-    border: none;
-    padding: var(--space-md);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-  }
-</style>

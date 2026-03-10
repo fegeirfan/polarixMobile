@@ -1,54 +1,49 @@
 <script lang="ts">
-  function dispatchNavigate(route: string) {
-    window.dispatchEvent(new CustomEvent('navigate', { detail: { route } }));
-  }
+  import PageHeader from './components/PageHeader.svelte';
+  import { drives } from './lib/data';
+  import { navigate, selectedDriveType, showToast } from './store';
+
+  let label = '';
+
+  const selectableDrives = drives.filter((drive) => drive.description);
+
+  const connect = () => {
+    showToast('Drive connected successfully!');
+    navigate('/home');
+  };
 </script>
 
-<div class="add-drive-container">
-  <div class="header">
-    <button class="back-btn" on:click={() => dispatchNavigate('/home')}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    </button>
-    <h2>Add Drive</h2>
-  </div>
+<div class="page active">
+  <PageHeader title="Add Drive" backRoute="/home" />
 
-  <div class="card">
-    <p>Connect a new cloud drive to start archiving your files.</p>
-    <button class="connect-btn">Connect Google Drive</button>
+  <div class="page-content">
+    <div class="add-drive-info">
+      <div class="add-drive-caption">Choose a cloud storage provider to connect to your Polarix account.</div>
+    </div>
+
+    <div class="drive-options">
+      {#each selectableDrives as drive}
+        <button class="drive-option" class:selected={$selectedDriveType === drive.name} on:click={() => selectedDriveType.set(drive.name)}>
+          <div class="drive-option-icon" style={`background:${drive.iconBackground};`}>{drive.icon}</div>
+          <div class="drive-option-info">
+            <div class="drive-option-name">{drive.name}</div>
+            <div class="drive-option-desc">{drive.description}</div>
+          </div>
+          <div class="drive-option-check">
+            {#if $selectedDriveType === drive.name}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+            {/if}
+          </div>
+        </button>
+      {/each}
+    </div>
+
+    <div class="connect-form">
+      <div class="form-group">
+        <label class="form-label" for="drive-label">Drive Label (optional)</label>
+        <input id="drive-label" bind:value={label} type="text" class="form-input" placeholder="e.g. Work Drive, Personal..." />
+      </div>
+      <button class="btn-submit" on:click={connect}>Connect Drive -&gt;</button>
+    </div>
   </div>
 </div>
-
-<style>
-  .add-drive-container {
-    padding: var(--space-md);
-  }
-
-  .header {
-    display: flex;
-    align-items: center;
-    margin-bottom: var(--space-lg);
-  }
-
-  .back-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-right: var(--space-md);
-  }
-
-  p {
-    margin-bottom: var(--space-lg);
-  }
-
-  .connect-btn {
-    width: 100%;
-    background-color: var(--color-accent);
-    color: white;
-    border: none;
-    padding: var(--space-md);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-  }
-</style>

@@ -1,88 +1,60 @@
 <script lang="ts">
-  function dispatchNavigate(route: string) {
-    window.dispatchEvent(new CustomEvent('navigate', { detail: { route } }));
+  import PageHeader from './components/PageHeader.svelte';
+  import { scripts } from './lib/data';
+  import { showToast } from './store';
+
+  let search = '';
+  let localStates = scripts.map((script) => script.active);
+
+  $: filteredScripts = scripts
+    .map((script, index) => ({ ...script, index }))
+    .filter((script) => script.name.toLowerCase().includes(search.toLowerCase()));
+
+  function toggleScript(index: number) {
+    localStates[index] = !localStates[index];
+    localStates = [...localStates];
+    showToast(localStates[index] ? 'Script enabled' : 'Script disabled');
   }
 </script>
 
-<div class="scripts-container">
-  <div class="header">
-    <h2>Scripts</h2>
-    <button class="add-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      <span>Add Script</span>
-    </button>
-  </div>
+<div class="page active">
+  <PageHeader title="Scripts" action={{ label: 'Add Script', icon: 'plus', onClick: () => showToast('New script editor opened') }} />
 
-  <div class="card script-card">
-    <div class="script-info">
-      <div class="script-name">Auto-categorize Invoices</div>
-      <div class="script-target">Target: work@example.com</div>
+  <div class="page-content">
+    <div class="search-bar">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+      <input bind:value={search} type="text" placeholder="Search scripts..." />
     </div>
-    <button class="run-btn">Run</button>
-  </div>
 
-  <div class="card script-card">
-    <div class="script-info">
-      <div class="script-name">Backup Personal Docs</div>
-      <div class="script-target">Target: user@gmail.com</div>
+    <div class="scripts-list">
+      {#each filteredScripts as script}
+        <div class="script-card">
+          <div class="script-card-header">
+            <div class="script-icon" style={`background:${script.iconBackground};`}>{script.icon}</div>
+            <div>
+              <div class="script-name">{script.name}</div>
+              <div class="script-trigger">{script.trigger}</div>
+            </div>
+            <div class="script-toggle" style="margin-left:auto;">
+              <button class="toggle" class:on={localStates[script.index]} on:click={() => toggleScript(script.index)} aria-label="Toggle Script"></button>
+            </div>
+          </div>
+
+          <div class="code-preview">
+            {#each script.preview as line, idx}
+              {line}{idx < script.preview.length - 1 ? '\n' : ''}
+            {/each}
+          </div>
+
+          <div class="script-footer">
+            <div class="script-status">
+              <div class="status-dot" class:status-dot-green={localStates[script.index]} class:status-dot-gray={!localStates[script.index]}></div>
+              <span class:status-active={localStates[script.index]} class:status-inactive={!localStates[script.index]}>{localStates[script.index] ? script.statusText : 'Inactive'}</span>
+            </div>
+            <button class="script-run-btn" on:click={() => showToast('Script running...')}>▶ Run</button>
+          </div>
+        </div>
+      {/each}
     </div>
-    <button class="run-btn">Run</button>
   </div>
-
 </div>
-
-<style>
-  .scripts-container {
-    padding: var(--space-md);
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-lg);
-  }
-
-  .add-btn {
-    display: flex;
-    align-items: center;
-    background-color: var(--color-accent);
-    color: white;
-    border: none;
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-weight: 500;
-  }
-
-  .add-btn svg {
-    margin-right: var(--space-sm);
-  }
-
-  .script-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-lg);
-  }
-
-  .script-name {
-    font-weight: 500;
-    margin-bottom: var(--space-xs);
-  }
-
-  .script-target {
-    font-size: 0.9rem;
-    color: var(--color-text-secondary);
-  }
-
-  .run-btn {
-    background: var(--color-background);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-primary);
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-weight: 500;
-  }
-</style>

@@ -1,79 +1,72 @@
 <script lang="ts">
-  function dispatchNavigate(route: string) {
-    window.dispatchEvent(new CustomEvent('navigate', { detail: { route } }));
-  }
+  import { activities, drives } from './lib/data';
+  import { navigate, showToast } from './store';
 </script>
 
-<div class="home-container">
-  <h2>Connected Drives</h2>
-
-  <div class="card">
-    <div class="drive-info">
-      <div class="drive-email">user@gmail.com</div>
-      <div class="storage-bar">
-        <div class="storage-usage" style="width: 60%;"></div>
+<div class="page active">
+  <div class="page-content">
+    <div class="home-hero">
+      <div class="home-hero-orb"></div>
+      <div class="home-greeting">Good morning 👋</div>
+      <div class="home-username">Alex Rivera</div>
+      <div class="home-stats">
+        <div class="home-stat">
+          <div class="home-stat-val">4</div>
+          <div class="home-stat-label">Drives</div>
+        </div>
+        <div class="home-stat">
+          <div class="home-stat-val">12</div>
+          <div class="home-stat-label">Tables</div>
+        </div>
+        <div class="home-stat">
+          <div class="home-stat-val">7</div>
+          <div class="home-stat-label">Scripts</div>
+        </div>
       </div>
     </div>
-    <button class="open-drive-btn">Open</button>
-  </div>
 
-  <div class="card">
-    <div class="drive-info">
-      <div class="drive-email">work@example.com</div>
-      <div class="storage-bar">
-        <div class="storage-usage" style="width: 30%;"></div>
-      </div>
+    <div class="section-header">
+      <div class="section-title">Connected Drives</div>
+      <button class="section-link" on:click={() => navigate('/add-drive')}>+ Add</button>
     </div>
-    <button class="open-drive-btn">Open</button>
-  </div>
 
-  <button class="fab" on:click={() => dispatchNavigate('/add-drive')}>
-    +
-  </button>
+    <div class="drives-scroll">
+      {#each drives.slice(0, 4) as drive}
+        <button class="drive-card" on:click={() => showToast(`Opening ${drive.name}...`)}>
+          <div class="drive-icon" style={`background:${drive.iconBackground};`}>{drive.icon}</div>
+          <div class="drive-name">{drive.name}</div>
+          <div class="drive-used">{drive.usage}</div>
+          <div class="drive-bar">
+            <div
+              class="drive-bar-fill"
+              style={`width:${drive.percent}%;${drive.gradient ? 'background: linear-gradient(90deg, #f59e0b, #ef4444);' : ''}`}
+            ></div>
+          </div>
+        </button>
+      {/each}
+
+      <button class="drive-add-card" on:click={() => navigate('/add-drive')}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2e6ef7" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+        <span>Add Drive</span>
+      </button>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Recent Activity</div>
+      <button class="section-link" on:click={() => navigate('/tables')}>View all</button>
+    </div>
+
+    <div class="activity-list">
+      {#each activities as activity}
+        <div class="activity-item">
+          <div class="activity-icon" style={`background:${activity.iconBackground}; font-size:18px;`}>{activity.icon}</div>
+          <div class="activity-info">
+            <div class="activity-name">{activity.name}</div>
+            <div class="activity-meta">{activity.meta}</div>
+          </div>
+          <div class="activity-time">{activity.time}</div>
+        </div>
+      {/each}
+    </div>
+  </div>
 </div>
-
-<style>
-  .home-container {
-    padding: var(--space-md);
-  }
-
-  h2 {
-    margin-bottom: var(--space-lg);
-  }
-
-  .card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-lg);
-  }
-
-  .drive-email {
-    font-weight: 500;
-    margin-bottom: var(--space-sm);
-  }
-
-  .storage-bar {
-    width: 150px;
-    height: 8px;
-    background-color: var(--color-border);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-  }
-
-  .storage-usage {
-    height: 100%;
-    background-color: var(--color-accent);
-    border-radius: var(--radius-sm);
-  }
-
-  .open-drive-btn {
-    background: var(--color-background);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-primary);
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-weight: 500;
-  }
-</style>
