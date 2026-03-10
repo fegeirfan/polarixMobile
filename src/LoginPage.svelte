@@ -42,6 +42,10 @@
 
     <button class="btn-primary" on:click={() => login('email')}>Sign in</button>
 
+    <button class="btn-admin" type="button" on:click={() => navigate('/admin')}>
+      Admin
+    </button>
+
     <div class="login-footer">
       Don't have an account? <a href="/signup">Create one</a>
     </div>

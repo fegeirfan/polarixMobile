@@ -8,7 +8,19 @@ export type Route =
   | '/add-row'
   | '/scripts'
   | '/profile'
-  | '/add-drive';
+  | '/add-drive'
+  | '/admin'
+  | '/admin/analytics'
+  | '/admin/users'
+  | '/admin/drives'
+  | '/admin/tables'
+  | '/admin/scripts'
+  | '/admin/audit'
+  | '/admin/settings';
+
+export function isAdminRoute(route: Route) {
+  return route.startsWith('/admin');
+}
 
 export const currentRoute = writable<Route>('/');
 

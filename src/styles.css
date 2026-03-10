@@ -328,6 +328,25 @@ body {
   transform: translateY(-1px);
 }
 
+.btn-admin {
+  margin-top: 10px;
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.86);
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-admin:hover {
+  background: rgba(15, 23, 42, 0.45);
+}
+
 .login-divider {
   display: flex;
   align-items: center;
@@ -1266,5 +1285,64 @@ body {
   .app-shell {
     max-width: 100%;
     box-shadow: none;
+  }
+}
+
+/* ═══════════════════════════════════
+   DESKTOP USER MODE (≥ 900px)
+   Sidebar nav + expanded content area
+═══════════════════════════════════ */
+@media (min-width: 900px) {
+  #app {
+    justify-content: flex-start;
+    align-items: stretch;
+  }
+
+  .app-shell {
+    max-width: none;
+    width: calc(100% - 220px);
+    margin-left: 220px;
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--gray-50);
+  }
+
+  /* Remove bottom-nav spacing from content on desktop */
+  .page-content {
+    padding-bottom: 24px;
+  }
+
+  /* Hide bottom nav on desktop */
+  #bottom-nav {
+    display: none;
+  }
+
+  /* Toast repositioned for desktop */
+  #toast {
+    bottom: 24px;
+    right: 24px;
+    left: auto;
+    transform: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    white-space: nowrap;
+  }
+
+  /* Wider home hero on desktop */
+  .home-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  /* Tables grid on desktop */
+  .tables-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Scripts list desktop */
+  .scripts-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
