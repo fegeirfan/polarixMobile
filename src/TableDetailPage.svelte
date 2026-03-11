@@ -1,11 +1,18 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import PageHeader from './components/PageHeader.svelte';
-  import { addRowFilters, tableRows } from './lib/data';
+  import { addRowFilters, tableRows, fetchTableRows } from './lib/data';
   import { navigate } from './store';
+
+  export let tableId: string | undefined = undefined;
 
   let activeFilter = 'All';
 
-  $: filteredRows = activeFilter === 'All' ? tableRows : tableRows.filter((row) => row.status === activeFilter);
+  onMount(() => {
+    fetchTableRows(tableId);
+  });
+
+  $: filteredRows = activeFilter === 'All' ? $tableRows : $tableRows.filter((row) => row.status === activeFilter);
 </script>
 
 <div class="page active">
@@ -30,7 +37,6 @@
       {#each filteredRows as row}
         <div class="row-card">
           <div class="row-card-header">
-            <div class="row-thumb">{row.icon}</div>
             <div class="row-title">{row.title}</div>
             <span class="row-badge" class:badge-active={row.status === 'Active'} class:badge-pending={row.status === 'Pending'} class:badge-archived={row.status === 'Archived'}>{row.status}</span>
           </div>

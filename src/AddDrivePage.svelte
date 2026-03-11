@@ -1,15 +1,37 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import PageHeader from './components/PageHeader.svelte';
-  import { drives } from './lib/data';
+  import { drives, fetchDrives } from './lib/data';
+  import { supabase } from './lib/supabaseClient';
   import { navigate, selectedDriveType, showToast } from './store';
 
   let label = '';
 
-  const selectableDrives = drives.filter((drive) => drive.description);
+  let selectableDrives: any[] = [];
+  onMount(() => {
+    fetchDrives();
+  });
 
-  const connect = () => {
-    showToast('Drive connected successfully!');
-    navigate('/home');
+  $: selectableDrives = $drives.filter((drive) => drive.description);
+
+  const connect = async () => {
+    const driveObj = selectableDrives.find(d => d.name === $selectedDriveType);
+    if (!driveObj) return showToast('Please select a drive type.');
+
+    const { error } = await supabase.from('drives').insert([{
+      name: label || $selectedDriveType,
+      usage: '0 GB / 15 GB',
+      percent: 0,
+      description: driveObj.description,
+      gradient: driveObj.gradient || false
+    }]);
+
+    if (error) {
+      showToast('Error connecting drive');
+    } else {
+      showToast('Drive connected successfully!');
+      navigate('/home');
+    }
   };
 </script>
 
@@ -24,7 +46,6 @@
     <div class="drive-options">
       {#each selectableDrives as drive}
         <button class="drive-option" class:selected={$selectedDriveType === drive.name} on:click={() => selectedDriveType.set(drive.name)}>
-          <div class="drive-option-icon" style={`background:${drive.iconBackground};`}>{drive.icon}</div>
           <div class="drive-option-info">
             <div class="drive-option-name">{drive.name}</div>
             <div class="drive-option-desc">{drive.description}</div>

@@ -1,10 +1,40 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import PageHeader from './components/PageHeader.svelte';
   import { showToast, navigate } from './store';
+  import { tables, fetchTables } from './lib/data';
+  import { supabase } from './lib/supabaseClient';
 
-  const submit = () => {
-    showToast('Row added successfully!');
-    navigate('/table-detail');
+  let selectedTableName = '';
+  let fileName = '';
+  let clientTag = '';
+  let status = 'Active';
+  let notes = '';
+
+  onMount(() => {
+    fetchTables();
+  });
+
+  const submit = async () => {
+    const table = $tables.find(t => t.name === selectedTableName);
+    if (!table) return showToast('Please select a table.');
+
+    const { error } = await supabase.from('table_rows').insert([{
+      table_id: table.id,
+      title: fileName,
+      status: status,
+      fields: [
+        { label: 'Client', value: clientTag },
+        { label: 'Notes', value: notes }
+      ]
+    }]);
+
+    if (error) {
+       showToast('Error adding row');
+    } else {
+       showToast('Row added successfully!');
+       navigate('/table-detail');
+    }
   };
 </script>
 
@@ -15,46 +45,35 @@
     <div class="form-body">
       <div class="form-group">
         <label class="form-label" for="row-table">Table</label>
-        <select id="row-table" class="form-select">
-          <option>Project Documents</option>
-          <option>Media Archive</option>
-          <option>Research Data</option>
-          <option>Email Attachments</option>
+        <select id="row-table" class="form-select" bind:value={selectedTableName}>
+          {#each $tables as tbl}
+            <option value={tbl.name}>{tbl.name}</option>
+          {/each}
         </select>
       </div>
 
       <div class="form-group">
         <label class="form-label" for="row-file-name">File Name</label>
-        <input id="row-file-name" type="text" class="form-input" placeholder="e.g. Q3_Report_Final.pdf" />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="row-drive">Drive</label>
-        <select id="row-drive" class="form-select">
-          <option>Google Drive</option>
-          <option>Dropbox</option>
-          <option>OneDrive</option>
-          <option>S3 Bucket</option>
-        </select>
+        <input id="row-file-name" type="text" class="form-input" bind:value={fileName} placeholder="e.g. Q3_Report_Final.pdf" />
       </div>
 
       <div class="form-group">
         <label class="form-label" for="row-client">Client / Tag</label>
-        <input id="row-client" type="text" class="form-input" placeholder="e.g. Acme Corp" />
+        <input id="row-client" type="text" class="form-input" bind:value={clientTag} placeholder="e.g. Acme Corp" />
       </div>
 
       <div class="form-group">
         <label class="form-label" for="row-status">Status</label>
-        <select id="row-status" class="form-select">
-          <option>Active</option>
-          <option>Pending</option>
-          <option>Archived</option>
+        <select id="row-status" class="form-select" bind:value={status}>
+          <option value="Active">Active</option>
+          <option value="Pending">Pending</option>
+          <option value="Archived">Archived</option>
         </select>
       </div>
 
       <div class="form-group">
         <label class="form-label" for="row-notes">Notes</label>
-        <textarea id="row-notes" class="form-input" rows="3" placeholder="Optional notes..." style="resize:none; line-height:1.5;"></textarea>
+        <textarea id="row-notes" bind:value={notes} class="form-input" rows="3" placeholder="Optional notes..." style="resize:none; line-height:1.5;"></textarea>
       </div>
 
       <div class="form-group">

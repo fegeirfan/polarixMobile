@@ -27,7 +27,6 @@
 
         {#each section.items as item}
           <button class="profile-item" on:click={() => handleItem(item.label)}>
-            <div class="profile-item-icon" style={`background:${item.iconBackground};`}>{item.icon}</div>
             <div class="profile-item-label">{item.label}</div>
             {#if item.value}
               <div class="profile-item-val">{item.value}</div>

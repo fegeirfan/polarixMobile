@@ -1,11 +1,16 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import PageHeader from './components/PageHeader.svelte';
-  import { tables } from './lib/data';
+  import { tables, fetchTables } from './lib/data';
   import { navigate, showToast } from './store';
+
+  onMount(() => {
+    fetchTables();
+  });
 
   let search = '';
 
-  $: filteredTables = tables.filter((table) => table.name.toLowerCase().includes(search.toLowerCase()));
+  $: filteredTables = $tables.filter((table) => table.name.toLowerCase().includes(search.toLowerCase()));
 </script>
 
 <div class="page active">
@@ -20,13 +25,12 @@
     <div class="tables-list">
       {#each filteredTables as table}
         <button class="table-card" on:click={() => navigate('/table-detail')}>
-          <div class="table-card-icon" style={`background:${table.iconBackground};`}>{table.icon}</div>
           <div class="table-card-name">{table.name}</div>
           <div class="table-card-desc">{table.description}</div>
           <div class="table-card-footer">
             <span class="table-tag table-tag-blue">{table.provider}</span>
             <span class="table-tag" class:table-tag-green={table.status === 'Active'} class:table-tag-amber={table.status === 'Syncing'} class:table-tag-red={table.status === 'Locked'}>{table.status}</span>
-            <span class="table-card-rows">{table.rows} rows</span>
+            <span class="table-card-rows">{table.rows_count} rows</span>
           </div>
         </button>
       {/each}

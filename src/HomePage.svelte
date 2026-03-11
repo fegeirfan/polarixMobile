@@ -1,6 +1,12 @@
 <script lang="ts">
-  import { activities, drives } from './lib/data';
+  import { onMount } from 'svelte';
+  import { activities, drives, fetchActivities, fetchDrives } from './lib/data';
   import { navigate, showToast } from './store';
+
+  onMount(() => {
+    fetchDrives();
+    fetchActivities();
+  });
 </script>
 
 <div class="page active">
@@ -31,9 +37,8 @@
     </div>
 
     <div class="drives-scroll">
-      {#each drives.slice(0, 4) as drive}
+      {#each $drives.slice(0, 4) as drive}
         <button class="drive-card" on:click={() => showToast(`Opening ${drive.name}...`)}>
-          <div class="drive-icon" style={`background:${drive.iconBackground};`}>{drive.icon}</div>
           <div class="drive-name">{drive.name}</div>
           <div class="drive-used">{drive.usage}</div>
           <div class="drive-bar">
@@ -57,9 +62,8 @@
     </div>
 
     <div class="activity-list">
-      {#each activities as activity}
+      {#each $activities as activity}
         <div class="activity-item">
-          <div class="activity-icon" style={`background:${activity.iconBackground}; font-size:18px;`}>{activity.icon}</div>
           <div class="activity-info">
             <div class="activity-name">{activity.name}</div>
             <div class="activity-meta">{activity.meta}</div>
