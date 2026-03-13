@@ -7,12 +7,11 @@
 
   let label = '';
 
-  let selectableDrives: any[] = [];
-  onMount(() => {
-    fetchDrives();
-  });
-
-  $: selectableDrives = $drives.filter((drive) => drive.description);
+  let selectableDrives = [
+    { name: 'Google Drive', description: 'Connect to your Google Workspace', gradient: true },
+    { name: 'OneDrive', description: 'Connect to Microsoft OneDrive', gradient: false },
+    { name: 'Dropbox', description: 'Connect to your Dropbox account', gradient: false }
+  ];
 
   const connect = async () => {
     const driveObj = selectableDrives.find(d => d.name === $selectedDriveType);

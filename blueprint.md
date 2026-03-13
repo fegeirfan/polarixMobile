@@ -21,3 +21,8 @@ The current objective is to replace the dummy data with a functional Supabase ba
 2.  **Define Schema:** Create corresponding tables in the Supabase instance (`drives`, `activities`, `tables`, `table_rows`, `scripts`).
 3.  **Refactor Data Layer:** Migrate `src/lib/data.ts` to fetch and write to Supabase instead of returning static arrays.
 4.  **Update UI:** Refactor Svelte components (like `HomePage.svelte` and `TablesPage.svelte`) to handle asynchronous data loading (using `#await` blocks where appropriate) and implement real write-actions instead of just showing toasts.
+
+### Latest Updates (Table & Row CRUD)
+- **TablesPage:** Added a "Create Table" modal and "Delete" button. Creating a table prompts for a Name and selects a Drive.
+- **TableDetailPage:** Added an "Add Row" modal and "Delete" button. Creating a row simulates file upload by asking for File Name and capturing a localized file upload path.
+- **Data Layer:** `src/lib/data.ts` contains `addTable`, `deleteTable`, `addTableRow`, and `deleteTableRow` mapped to the corresponding Supabase functions to synchronize state.

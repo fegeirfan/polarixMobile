@@ -1,12 +1,58 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { navigate, showToast } from './store';
+  import { supabase } from './lib/supabaseClient';
 
   let email = '';
   let password = '';
+  
+  let isAuthenticating = false;
+  let lastAuthAttempt = 0;
 
-  function login(type: 'google' | 'email') {
-    showToast(type === 'google' ? 'Signed in with Google' : 'Signed in with Email');
-    navigate('/home');
+  onMount(async () => {
+    // Check if user is already logged in
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      navigate('/home');
+    }
+    
+    // Listen for auth state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        navigate('/home');
+      }
+    });
+  });
+
+  async function login(type: 'google' | 'email') {
+    if (type === 'google') {
+      const now = Date.now();
+      // Block repeated clicks within 3 seconds
+      if (isAuthenticating || (now - lastAuthAttempt < 3000)) {
+        showToast('Please wait a moment before trying again.');
+        return;
+      }
+      
+      isAuthenticating = true;
+      lastAuthAttempt = now;
+
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin, // You might need to adjust this depending on your setup
+          }
+        });
+
+        if (error) throw error;
+      } catch (error: any) {
+        showToast(error.message || 'Failed to sign in with Google');
+      } finally {
+        isAuthenticating = false;
+      }
+    } else {
+      showToast('Email sign in coming soon!');
+    }
   }
 </script>
 

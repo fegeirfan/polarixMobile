@@ -76,6 +76,46 @@ export async function fetchTableRows(tableId?: string) {
   if (data) tableRows.set(data);
 }
 
+export async function addTable(tableData: Omit<Table, 'id' | 'created_at'>) {
+  const { error } = await supabase.from('tables').insert(tableData);
+  if (!error) {
+    await fetchTables();
+    return true;
+  }
+  console.error("Error adding table:", error);
+  return false;
+}
+
+export async function deleteTable(tableId: string) {
+  const { error } = await supabase.from('tables').delete().eq('id', tableId);
+  if (!error) {
+    await fetchTables();
+    return true;
+  }
+  console.error("Error deleting table:", error);
+  return false;
+}
+
+export async function addTableRow(rowData: Omit<TableRow, 'id' | 'created_at'>) {
+  const { error } = await supabase.from('table_rows').insert(rowData);
+  if (!error) {
+    await fetchTableRows(rowData.table_id);
+    return true;
+  }
+  console.error("Error adding table row:", error);
+  return false;
+}
+
+export async function deleteTableRow(rowId: string, tableId: string) {
+  const { error } = await supabase.from('table_rows').delete().eq('id', rowId);
+  if (!error) {
+    await fetchTableRows(tableId);
+    return true;
+  }
+  console.error("Error deleting table row:", error);
+  return false;
+}
+
 export async function fetchScripts() {
   const { data } = await supabase.from('scripts').select('*').order('created_at', { ascending: true });
   if (data) scripts.set(data);
